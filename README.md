@@ -9,7 +9,8 @@ The current implementation of [safe coercion](https://wiki.haskell.org/GHC/Coerc
 has no distinction of directions. `Coercible A B` never just means `A` is Coercible to `B`,
 it's always `A` is Coercible **to and from** `B`.
 
-This symmetry is nice in many situations, and greatly simplifies many situations.
+This symmetry is nice in many situations, and greatly simplifies the semantics of
+`GeneralizedNewtypeDeriving` and its superior brother `DerivingVia`.
 But everything has an exception. Sometimes, you want weaker property on two types:
 `A` is safely coercible to `B`, but not in the other way around.
 
