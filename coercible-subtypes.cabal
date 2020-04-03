@@ -1,0 +1,22 @@
+cabal-version:       3.0
+name:                coercible-subtypes
+version:             0.1.0.0
+synopsis:            Coercible but only in one direction
+description:         See README.md
+bug-reports:         https://github.com/viercc/
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Koji Miyazato
+maintainer:          viercc@gmail.com
+copyright:           Koji Miyazato (c) 2020
+category:            Data
+build-type:          Simple
+extra-source-files:  CHANGELOG.md, README.md
+
+library
+  exposed-modules:     Data.Type.Coercion.Sub
+  build-depends:       base >=4.12 && <4.15,
+                       profunctors
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  ghc-options:         -Wall -Wcompat
