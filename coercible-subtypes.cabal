@@ -3,7 +3,7 @@ name:                coercible-subtypes
 version:             0.1.0.0
 synopsis:            Coercible but only in one direction
 description:         See README.md
-bug-reports:         https://github.com/viercc/
+bug-reports:         https://github.com/viercc/coercible-subtypes/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Koji Miyazato
