@@ -88,4 +88,4 @@ This library contains `mapR` and other combinators with enough restrictions to k
 ----
 
 <a id="fn1">\[1\]</a> Technically, anyone can define an unlawful `Functor (Op b)` instance.
-But at that point, doing so is more closer to `unsafeCoerce` than importing `MyModule.Internal`.
+But at that point, doing so is closer to `unsafeCoerce` than importing `MyModule.Internal`.
