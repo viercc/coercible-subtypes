@@ -68,23 +68,24 @@ You can omit the constraint `Functor t` and it will compile just fine.
 But that does not mean it is unnecessary! Without it, the premise -- having `Sub a b` not necessarily mean you can convert `b -> a` -- is ruined.
 
 ``` haskell
-newtype Op b a = Op { getOp :: a -> b }
-
 mapR' :: ( forall x x'. Coercible x x' => Coercible (t x) (t x') )
      => Sub a b -> Sub (t a) (t b)
+
+newtype Op b a = Op { getOp :: a -> b }
 
 terrible :: forall a b. Sub a b -> b -> a
 terrible a2b = getOp $ ouch (Op id)
   where
     ouch :: Op a a -> Op a b
     ouch = upcastWith (mapR' a2b)
-
-deadly :: forall a b. Sub a b -> Coercion a b
-deadly a2b = upcastWith (mapR' a2b) (Coercion :: Coercion a a)
 ```
 
 By having `Functor t`, it only gives you what you already have been able to get (`fmap (upcastWith a2b) :: f a -> f b`),
-just more efficient one.
+just more efficient one.[\[1\]](#fn1)
 
-(Technically, anyone can define an unlawful `Functor (Op b)` instance. But at that point,
-doing so is more closer to `unsafeCoerce` than importing `MyModule.Internal`.)
+This library contains `mapR` and other combinators with enough restrictions to keep the subtype relation.
+
+----
+
+<a id="fn1">\[1\]</a> Technically, anyone can define an unlawful `Functor (Op b)` instance.
+But at that point, doing so is more closer to `unsafeCoerce` than importing `MyModule.Internal`.
