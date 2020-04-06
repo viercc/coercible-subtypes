@@ -75,7 +75,7 @@ module Main where
 In this application, the user has to convert `Map String Triangle` to
 `Map String (Int, Int, Int)`, revealing the edge lengths of the triangles.
 While it is easy to do so with `fmap getEdges`,
-using `fmap` here can make an entire copy of the Map^[†](#footnote).
+using `fmap` here can make an entire copy of the Map<sup>[†](#footnote)</sup>.
 This is wasted work and memory. Instead, the user can use `mapR toEdges` to get
 `Sub (Map String Triangle) (Map String (Int, Int, Int))`
 and then `upcastWith` to perform zero-cose coercion over `Map`.
@@ -101,7 +101,7 @@ There are some other methods to achive the goal of this library.
 
 --------
 
-\ ^(<a id="footnote">†</a> For `Data.Map`, which [containers](https://hackage.haskell.org/package/containers)
+<a id="footnote">†</a> For `Data.Map`, which [containers](https://hackage.haskell.org/package/containers)
 package provides, can optimize `fmap` away via proper inlining and rewrite rules. The purpose of this library
 is turning the optimization into explicit code, or handling the case when the container type in use does not
-provide such an opportunity via rewrite rules.)
+provide such an opportunity via rewrite rules.</small>
