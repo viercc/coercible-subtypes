@@ -6,9 +6,9 @@ module Data.Type.Coercion.Sub(
   {- | @Sub a b@ witnesses a zero-cost conversion @a -> b@.
 
   @Sub@ is a newtype wrapper around 'Coercion', but made opaque to hide
-  the ability to 'Data.Coerce.coerce' into other-direction.
+  the ability to 'Data.Coerce.coerce' into other direction.
 
-  This is convenient for newtype wrappers which give additional guarantee.
+  This is convenient for newtype wrappers which give additional guarantees.
 
   As an example, think about the following code:
 
@@ -30,8 +30,9 @@ module Data.Type.Coercion.Sub(
   direction, as in @coerce (10,5) :: Range Int@.
 
   By exporting only @Sub (Range a) (a,a)@ value from your module,
-  this user can get @Sub [Range a] [(a,a)]@ using 'mapR'.
-
+  this user can get @Sub [Range a] [(a,a)]@ using 'mapR',
+  without being able to make an invalid value.
+  
   -}
   Sub(),
   sub, toSub, upcastWith, equiv, gequiv,

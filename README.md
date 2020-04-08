@@ -17,8 +17,8 @@ This feature is not different to `Coercion`.
 
 The difference is that while `Coercion` represents
 bidirectional relation, `Sub` represents unidirectional relation.
-`Coercion a b` and its underlying type class `Coercible a b` witnesses you can coerce both `a` to `b` and `b` to `a`.
-Unlike that, `Sub a b` only allow you to coerce `a` to `b`, not `b` to `a`.
+`Coercion a b` and its underlying type class `Coercible a b` witnesse you can coerce both `a` to `b` and `b` to `a`.
+Unlike that, `Sub a b` only allows you to coerce `a` to `b`, not `b` to `a`.
 
 ## Usage Example
 
@@ -78,7 +78,7 @@ While it is easy to do so with `fmap getEdges`,
 using `fmap` here can make an entire copy of the Map<sup>[†](#footnote)</sup>.
 This is wasted work and memory. Instead, the user can use `mapR toEdges` to get
 `Sub (Map String Triangle) (Map String (Int, Int, Int))`
-and then `upcastWith` to perform zero-cose coercion over `Map`.
+and then `upcastWith` to perform zero cost coercion over `Map`.
 
 ## Comparison against other methods
 
@@ -95,7 +95,7 @@ There are some other methods to achive the goal of this library.
     So, it is possible you don't need this library at all.
   
   * The downside is whether it works or not is on the provider of the
-    "container" type in use, and GHC doing expected optimization.
+    "container" type in use, and GHC doing expected optimizations.
     Without reading source codes and examining the GHC optimization result (e.g. `-ddump-rule-firings`),
     you can't be sure you are doing the conversion zero-cost.
 
@@ -103,5 +103,5 @@ There are some other methods to achive the goal of this library.
 
 <a id="footnote">†</a> For `Data.Map`, which [containers](https://hackage.haskell.org/package/containers)
 package provides, can optimize `fmap` away via proper inlining and rewrite rules. The purpose of this library
-is turning the optimization into explicit code, or handling the case when the container type in use does not
+is turning optimizations into explicit codes, or handling the cases when the container type in use does not
 provide such an opportunity via rewrite rules.</small>
