@@ -1,6 +1,6 @@
 cabal-version:       2.2
 name:                coercible-subtypes
-version:             0.1.0.0
+version:             0.1.1.0
 stability:           experimental
 synopsis:            Coercible but only in one direction
 description: Newtype wrapper 'Data.Type.Coercion.Sub.Sub'
@@ -15,7 +15,7 @@ license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Koji Miyazato
 maintainer:          viercc@gmail.com
-copyright:           (c) 2020 Koji Miyazato
+copyright:           (c) 2020-2021 Koji Miyazato
 category:            Data
 build-type:          Simple
 extra-source-files:  CHANGELOG.md, README.md
