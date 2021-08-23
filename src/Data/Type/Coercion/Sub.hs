@@ -39,8 +39,9 @@ module Data.Type.Coercion.Sub(
 
   coercionIsSub,
 
+  instantiate,
   mapR, contramapR,
-  bimapR, dimapR
+  bimapR, prodR, prod3R, sumR, dimapR, arrR
 ) where
 
 import           Data.Coerce
@@ -96,26 +97,57 @@ This is prevented by evaluating both arguments of `equiv`, making `bad ab` a bot
 
 -----------------------------
 
+-- | For a @Sub@ relation between type constructors @f@ and @g@,
+--   create an instance of subtype relation @Sub (f a) (g a)@ for any type
+--   parameter @a@.
+instantiate :: forall j k (f :: j -> k) (g :: j -> k) (a :: j).
+  Sub f g -> Sub (f a) (g a)
+instantiate (Sub Coercion) = sub
+
 -- | Extend subtype relation covariantly.
 mapR :: ( forall x x'. Coercible x x' => Coercible (t x) (t x')
         , Functor t)
      => Sub a b -> Sub (t a) (t b)
 mapR (Sub Coercion) = Sub Coercion
 
--- | Extend subtype relation contravariantly
+-- | Extend subtype relation contravariantly.
 contramapR :: ( forall x x'. Coercible x x' => Coercible (t x) (t x')
               , Contravariant t)
            => Sub a b -> Sub (t b) (t a)
 contramapR (Sub Coercion) = Sub Coercion
 
+-- | Extend subtype relation over a 'Bifunctor'.
 bimapR :: ( forall x x' y y'.
               (Coercible x x', Coercible y y') => Coercible (t x y) (t x' y')
           , Bifunctor t)
        => Sub a a' -> Sub b b' -> Sub (t a b) (t a' b')
 bimapR (Sub Coercion) (Sub Coercion) = Sub Coercion
 
+-- | 'bimapR' specialized for the pair type '(a,b)'
+prodR :: Sub a a' -> Sub b b' -> Sub (a,b) (a',b')
+prodR = bimapR
+
+infixr 3 `prodR`
+
+-- | 'bimapR' specialized for 'Either'
+sumR :: Sub a a' -> Sub b b' -> Sub (Either a b) (Either a' b')
+sumR = bimapR
+
+infixr 2 `sumR`
+
+-- | Extend subtype relation over the 3-tuple types '(a,b,c)'
+prod3R :: Sub a a' -> Sub b b' -> Sub c c' -> Sub (a,b,c) (a',b',c')
+prod3R (Sub Coercion) (Sub Coercion) (Sub Coercion) = Sub Coercion
+
+-- | Extend subtype relation over a 'Profunctor'.
 dimapR :: ( forall x x' y y'.
               (Coercible x x', Coercible y y') => Coercible (t x y) (t x' y')
           , Profunctor t)
        => Sub a a' -> Sub b b' -> Sub (t a' b) (t a b')
 dimapR (Sub Coercion) (Sub Coercion) = Sub Coercion
+
+-- | 'dimapR' specialized for '(->)'
+arrR :: Sub a a' -> Sub b b' -> Sub (a' -> b) (a -> b')
+arrR = dimapR
+
+infixr 1 `arrR`

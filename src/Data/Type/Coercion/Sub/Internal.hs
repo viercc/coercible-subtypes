@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE InstanceSigs          #-}
 {-# LANGUAGE PolyKinds             #-}
-
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {- |
 
 This module exposes internals of "Data.Type.Coercion.Sub".
@@ -18,21 +20,18 @@ module Data.Type.Coercion.Sub.Internal(
 import           Control.Category
 import           Prelude                    hiding (id, (.))
 
+import           Data.Coerce
 import           Data.Type.Coercion
 
 newtype Sub (a :: k) (b :: k) = Sub { getSub :: Coercion a b }
-  deriving (Eq, Ord, Show)
--- It is intentional to omit some instances.
---
--- TestCoercion instance should not exist.
--- Knowing `Sub a b` and `Sub a c` should not conclude
--- `Coercible b c`.
---
--- Among instances `Coercion` has, Enum, Bounded, and Read are
--- excluded because they allows to make new value of `Sub a b`.
--- Constructing `Sub a b` values must be done through
--- combinators provided by this module or exported for
--- abstract type under library author's careful choice.
+  deriving stock (Eq, Ord, Show)
+-- It is intentional to omit the 'TestCoercion' instance, existing for @Coercion@.
+-- Knowing @Sub a b@ and @Sub a c@ should not conclude
+-- @Coercible b c@.
+
+deriving stock instance Coercible a b => Read (Sub a b)
+deriving newtype instance Coercible a b => Enum (Sub a b)
+deriving newtype instance Coercible a b => Bounded (Sub a b)
 
 instance Category Sub where
   id :: Sub a a
