@@ -27,7 +27,11 @@ source-repository HEAD
 
 library
   exposed-modules:     Data.Type.Coercion.Sub,
-                       Data.Type.Coercion.Sub.Internal
+                       Data.Type.Coercion.Sub.Internal,
+                       Data.Type.Coercion.Related,
+                       Data.Type.Coercion.Related.Internal,
+                       Newtype.Union,
+                       Newtype.Intersection
   build-depends:       base >=4.12 && <4.17,
                        profunctors
   hs-source-dirs:      src
