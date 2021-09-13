@@ -1,6 +1,6 @@
 cabal-version:       2.2
 name:                coercible-subtypes
-version:             0.1.1.0
+version:             0.2.0.0
 stability:           experimental
 synopsis:            Coercible but only in one direction
 description: Newtype wrapper 'Data.Type.Coercion.Sub.Sub'

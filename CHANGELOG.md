@@ -1,5 +1,10 @@
 # Revision history for coercible-subtypes
 
+## 0.2.0.0 -- 2021-09-13
+
+* Add `Related`
+* Add `IsIntersection` and `IsUnion` facilities
+
 ## 0.1.1.0 -- 2021-08-24
 
 * Add instances `Coercible a b => (Read (Sub a b), Enum (Sub a b), Bounded (Sub a b))`
