@@ -2,38 +2,35 @@
 {-# LANGUAGE PolyKinds             #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes            #-}
+{- | @'Sub' a b@ witnesses a zero-cost conversion @a -> b@.
+
+=== Example
+
+Think about the following code:
+
+> -- | A pair @(x::a, y::a)@, but guaranteed @x <= y@
+> newtype Range a = MkRange (a,a)
+>
+> getRange :: Range a -> (a,a)
+> getRange = coerce
+> mkRange :: Ord a => a -> a -> Range a
+> mkRange x y = if x <= y then MkRange (x,y) else MkRange (y,x)
+
+If you want to provide this type from a library you maintain,
+you would want to keep @Range@ abstract from outside of the module.
+
+A user may want to convert @[Range a]@ to @[(a,a)]@ without actually
+traversing the list. This is possible if the user have access to the
+internals, or you export a @Coercion (Range a) (a,a)@ value. But doing so
+breaks the guarantee, because it also allows to use @Coercible@ in the other
+direction, as in @coerce (10,5) :: Range Int@.
+
+By exporting only @Sub (Range a) (a,a)@ value from your module,
+this user can get @Sub [Range a] [(a,a)]@ using 'mapR',
+without being able to make an invalid value.
+
+-}
 module Data.Type.Coercion.Sub(
-  {- | @Sub a b@ witnesses a zero-cost conversion @a -> b@.
-
-  @Sub@ is a newtype wrapper around 'Coercion', but made opaque to hide
-  the ability to 'Data.Coerce.coerce' into other direction.
-
-  This is convenient for newtype wrappers which give additional guarantees.
-
-  As an example, think about the following code:
-
-  > -- | A pair @(x::a, y::a)@, but guaranteed @x <= y@
-  > newtype Range a = MkRange (a,a)
-  >
-  > getRange :: Range a -> (a,a)
-  > getRange = coerce
-  > mkRange :: Ord a => a -> a -> Range a
-  > mkRange x y = if x <= y then MkRange (x,y) else MkRange (y,x)
-
-  If you want to provide this type from a library you maintain,
-  you would want to keep @Range@ abstract from outside of the module.
-
-  An user may want to convert @[Range a]@ to @[(a,a)]@ without actually
-  traversing the list. This is possible if the user have access to the
-  internals, or you export a @Coercion (Range a) (a,a)@ value. But doing so
-  breaks the guarantee, because it also allows to use @Coercible@ in the other
-  direction, as in @coerce (10,5) :: Range Int@.
-
-  By exporting only @Sub (Range a) (a,a)@ value from your module,
-  this user can get @Sub [Range a] [(a,a)]@ using 'mapR',
-  without being able to make an invalid value.
-  
-  -}
   Sub(),
   sub, toSub, upcastWith, equiv, gequiv,
 
@@ -53,10 +50,11 @@ import           Data.Profunctor                 (Profunctor)
 
 import           Data.Type.Coercion.Sub.Internal
 
--- | Make a witness for type-safe casting which respects direction.
+-- | Make a directed witness of @'coerce' :: a -> b@.
 sub :: Coercible a b => Sub a b
 sub = Sub Coercion
 
+-- | Make a directed witness of @'coerce' :: a -> b@, from a 'Coercion' value.
 toSub :: Coercion a b -> Sub a b
 toSub = Sub
 
@@ -146,7 +144,7 @@ dimapR :: ( forall x x' y y'.
        => Sub a a' -> Sub b b' -> Sub (t a' b) (t a b')
 dimapR (Sub Coercion) (Sub Coercion) = Sub Coercion
 
--- | 'dimapR' specialized for '(->)'
+-- | 'dimapR' specialized for functions @(->)@
 arrR :: Sub a a' -> Sub b b' -> Sub (a' -> b) (a -> b')
 arrR = dimapR
 

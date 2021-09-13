@@ -23,6 +23,15 @@ import           Prelude                    hiding (id, (.))
 import           Data.Coerce
 import           Data.Type.Coercion
 
+{- |
+  @Sub@ is a newtype wrapper around 'Coercion', but made opaque to hide
+  the ability to 'Data.Coerce.coerce' into other direction.
+
+  This is convenient for newtype wrappers which give additional guarantees.
+
+  You can make @Sub@ witnesses by using combinators in this module, or the methods of
+  the @'Category' Sub@ instance: 'id' and @('.')@.
+-}
 newtype Sub (a :: k) (b :: k) = Sub { getSub :: Coercion a b }
   deriving stock (Eq, Ord, Show)
 -- It is intentional to omit the 'TestCoercion' instance, existing for @Coercion@.
