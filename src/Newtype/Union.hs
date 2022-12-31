@@ -1,8 +1,6 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE TypeOperators #-}
 module Newtype.Union(
   module Data.Type.Coercion.Related,
   IsUnion(..),
@@ -18,7 +16,7 @@ import Data.Type.Coercion.Sub (sub, equiv)
 import Data.Type.Coercion.Sub.Internal
 import Data.Type.Coercion.Related
 import Data.Type.Coercion.Related.Internal
-import Data.Type.Coercion ( Coercion(Coercion))
+import Data.Type.Coercion ( Coercion(Coercion), TestCoercion(..))
 
 -- | @IsUnion x y z@ witnesses the fact:
 --
@@ -35,6 +33,14 @@ data IsUnion x y z = IsUnion
     elim :: forall r. Sub x r -> Sub y r -> Sub z r
       -- ^ Given both @x@ and @y@ can be safely coerced to @r@, too @z@ can.
   }
+
+instance Eq (IsUnion x y z) where
+  _ == _ = True
+instance Ord (IsUnion x y z) where
+  compare _ _ = EQ
+
+instance TestCoercion (IsUnion x y) where
+  testCoercion u1 u2 = Just (unique u1 u2)
 
 -- | For a pair of 'Related' types @x@ and @y@, make some (existentially quantified)
 --   type @xy@ where @xy@ is a union type of @x, y@.
@@ -53,18 +59,27 @@ greater l = IsUnion{ inl = l, inr = id, elim=seq }
 
 -- | Union is idempotent.
 --
---   Note: combining @idemp@ and 'unique', @IsUnion x x z -> Coercible x z@ holds.
+--   Note: combining @idemp@ and 'unique', @IsUnion x x z -> Coercion x z@ holds.
 idemp :: IsUnion x x x
 idemp = greater id
 
 -- | Union is commutative.
 --
---   Note: combining @commutative@ and 'unique', @IsUnion x y xy -> IsUnion y x yx -> Coercible xy yx@ holds.
+--   Note: combining @commutative@ and 'unique', @IsUnion x y xy -> IsUnion y x yx -> Coercion xy yx@ holds.
 commutative :: IsUnion x y z -> IsUnion y x z
 commutative xyz = IsUnion{ inl = inr xyz, inr = inl xyz, elim = flip (elim xyz) }
 
 -- | Union is associative.
-associative :: IsUnion x y xy -> IsUnion xy z xy'z -> IsUnion y z yz -> IsUnion x yz x'yz -> Coercion xy'z x'yz
-associative xy xy'z yz x'yz =
-    equiv (elim xy'z (elim xy (inl x'yz) (inr x'yz . inl yz)) (inr x'yz . inr yz))
-          (elim x'yz (inl xy'z . inl xy) (elim yz (inl xy'z . inr xy) (inr xy'z)))
+--
+--   Note: combining @associative@ and 'unique', the following holds.
+--   
+--   >    IsUnion x y xy -> IsUnion xy z xy'z
+--   > -> IsUnion y z yz -> IsUnion x yz x'yz
+--   > -> Coercion xy'z x'yz 
+associative :: IsUnion x y xy -> IsUnion xy z xyz -> IsUnion y z yz -> IsUnion x yz xyz
+associative xy xy'z yz =
+    IsUnion {
+       inl = inl xy'z . inl xy 
+     , inr = elim yz (inl xy'z . inr xy) (inr xy'z)
+     , elim = \x_r yz_r -> elim xy'z (elim xy x_r (yz_r . inl yz)) (yz_r . inr yz)
+    }

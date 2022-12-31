@@ -1,5 +1,14 @@
 # Revision history for coercible-subtypes
 
+## 0.3.0.0 -- 2023-01-01
+
+* Breaking changes
+  
+  * Change the `Newtype.Intersection.associative` and `Newtype.Union.associative` to new,
+    more succinct type.
+
+* Instance added to `IsIntersection` and `IsUnion`
+
 ## 0.2.0.0 -- 2021-09-13
 
 * Add `Related`

@@ -2,7 +2,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE TypeOperators #-}
 module Newtype.Intersection(
   module Data.Type.Coercion.Related,
   IsIntersection(..),
@@ -17,7 +16,7 @@ import Data.Type.Coercion.Sub (equiv, sub)
 import Data.Type.Coercion.Sub.Internal
 import Data.Type.Coercion.Related
 import Data.Type.Coercion.Related.Internal
-import Data.Type.Coercion ( Coercion(Coercion) )
+import Data.Type.Coercion ( Coercion(Coercion), TestCoercion(..) )
 
 -- | @IsIntersection x y z@ witnesses the fact:
 --
@@ -33,6 +32,14 @@ data IsIntersection x y z = IsIntersection
     proj2 :: !(Sub z y),
     conjunct :: forall s. Sub s x -> Sub s y -> Sub s z
   }
+
+instance Eq (IsIntersection x y z) where
+  _ == _ = True
+instance Ord (IsIntersection x y z) where
+  compare _ _ = EQ
+
+instance TestCoercion (IsIntersection x y) where
+  testCoercion u1 u2 = Just (unique u1 u2)
 
 -- | For a pair of 'Related' types @x@ and @y@, make some (existentially quantified)
 --   type @xy@ where @xy@ is an intersection type of @x, y@.
@@ -52,18 +59,27 @@ lesser l = IsIntersection{ proj1=id, proj2=l, conjunct= \sx !_ -> sx }
 
 -- | Intersection is idempotent.
 --
---   Note: combining @idemp@ and 'unique', @IsIntersection x x z -> Coercible x z@ holds.
+--   Note: combining @idemp@ and 'unique', @IsIntersection x x z -> Coercion x z@ holds.
 idemp :: IsIntersection x x x
 idemp = lesser id
 
 -- | Intersection is commutative.
 --
---   Note: combining @commutative@ and 'unique', @IsIntersection x x z -> Coercible x z@ holds.
+--   Note: combining @commutative@ and 'unique', @IsIntersection x y xy -> IsIntersection y x yx -> Coercion xy yx@ holds.
 commutative :: IsIntersection x y z -> IsIntersection y x z
 commutative xyz = IsIntersection{ proj1 = proj2 xyz, proj2 = proj1 xyz, conjunct = flip (conjunct xyz)}
 
 -- | Intersection is associative.
-associative :: IsIntersection x y xy -> IsIntersection xy z xy'z -> IsIntersection y z yz -> IsIntersection x yz x'yz -> Coercion xy'z x'yz
-associative xy xy'z yz x'yz =
-    equiv (conjunct x'yz (proj1 xy . proj1 xy'z) (conjunct yz (proj2 xy . proj1 xy'z) (proj2 xy'z)))
-          (conjunct xy'z (conjunct xy (proj1 x'yz) (proj1 yz . proj2 x'yz)) (proj2 yz . proj2 x'yz))
+--
+--   Note: combining @associative@ and 'unique', the following holds.
+--   
+--   >    IsIntersection x y xy -> IsIntersection xy z xy'z
+--   > -> IsIntersection y z yz -> IsIntersection x yz x'yz
+--   > -> Coercion xy'z x'yz 
+associative :: IsIntersection x y xy -> IsIntersection xy z xyz -> IsIntersection y z yz -> IsIntersection x yz xyz
+associative xy xy'z yz =
+    IsIntersection {
+       proj1 = proj1 xy . proj1 xy'z
+     , proj2 = conjunct yz (proj2 xy . proj1 xy'z) (proj2 xy'z)
+     , conjunct = \s_x s_yz -> conjunct xy'z (conjunct xy s_x (proj1 yz . s_yz)) (proj2 yz . s_yz)
+    }
