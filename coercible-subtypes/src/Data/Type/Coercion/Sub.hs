@@ -38,7 +38,7 @@ module Data.Type.Coercion.Sub(
 
   instantiate,
   mapR, contramapR,
-  bimapR, prodR, prod3R, sumR, dimapR, arrR
+  bimapR, prodR, prod3R, sumR, arrR, arrowR
 ) where
 
 import           Data.Coerce
@@ -46,9 +46,9 @@ import           Data.Type.Coercion
 
 import           Data.Bifunctor                  (Bifunctor)
 import           Data.Functor.Contravariant      (Contravariant)
-import           Data.Profunctor                 (Profunctor)
 
 import           Data.Type.Coercion.Sub.Internal
+import Control.Arrow (Arrow)
 
 -- | Make a directed witness of @'coerce' :: a -> b@.
 sub :: Coercible a b => Sub a b
@@ -137,15 +137,15 @@ infixr 2 `sumR`
 prod3R :: Sub a a' -> Sub b b' -> Sub c c' -> Sub (a,b,c) (a',b',c')
 prod3R (Sub Coercion) (Sub Coercion) (Sub Coercion) = Sub Coercion
 
--- | Extend subtype relation over a 'Profunctor'.
-dimapR :: ( forall x x' y y'.
-              (Coercible x x', Coercible y y') => Coercible (t x y) (t x' y')
-          , Profunctor t)
-       => Sub a a' -> Sub b b' -> Sub (t a' b) (t a b')
-dimapR (Sub Coercion) (Sub Coercion) = Sub Coercion
-
--- | 'dimapR' specialized for functions @(->)@
+-- | 'arrowR' specialized for functions @(->)@
 arrR :: Sub a a' -> Sub b b' -> Sub (a' -> b) (a -> b')
-arrR = dimapR
+arrR = arrowR
 
 infixr 1 `arrR`
+
+-- | Extend subtype relation over an 'Arrow'.
+arrowR :: ( forall x x' y y'.
+              (Coercible x x', Coercible y y') => Coercible (t x y) (t x' y')
+          , Arrow t)
+       => Sub a a' -> Sub b b' -> Sub (t a' b) (t a b')
+arrowR (Sub Coercion) (Sub Coercion) = Sub Coercion
