@@ -1,5 +1,13 @@
 # Revision history for coercible-subtypes
 
+## 1 -- 2024-12-22
+
+* Breaking changes
+
+  * Remove dependency to `profunctors` package. A `Profunctor`-related function `dimapR`
+    is removed and replaced by `arrowR`.
+    `dimapR` is moved to `coercible-subtypes-profunctor` package.
+
 ## 0.3.0.0 -- 2023-01-01
 
 * Breaking changes
