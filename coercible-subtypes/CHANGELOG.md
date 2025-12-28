@@ -1,5 +1,12 @@
 # Revision history for coercible-subtypes
 
+## 1.1 -- 2025-12-28
+
+* Add distributivity axioms for `Newtype.Union` and `Newtype.Intersection`.
+* `Newtype.LatticeProperties`: Collection of properties of
+  union and intersection types.
+* Documentation improvements
+
 ## 1 -- 2024-12-22
 
 * Breaking changes
